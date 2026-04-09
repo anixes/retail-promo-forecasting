@@ -24,3 +24,6 @@ pip-delete-this-directory.txt
 # OS
 .DS_Store
 Thumbs.db
+
+# Personal Interview Prep
+interview_prep/
