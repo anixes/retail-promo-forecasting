@@ -25,10 +25,13 @@ The repository is structured for modularity and reproducibility.
 ├── src/
 │   ├── data/                       # Optimized loaders and chain-level aggregators
 │   ├── features/                   # Temporal engineering: seasonal lags ($Lag_{52}$) and rolling dynamics
-│   ├── regression/                 # High-dim Fixed Effects modeling (AbsorbingLS)
-│   ├── forecasting/                # Baseline, Prophet, and LightGBM engines
-│   └── pipelines/                  # Pipeline orchestration
-└── main.py                         # CLI interface
+│   ├── regression/                 # Econometric analysis: Fixed Effects and HTE models
+│   │   └── analysis.py             # Consolidated econometric modeling logic
+│   ├── forecasting/                # Predictive models: Baseline, Prophet, and LightGBM
+│   │   ├── lgbm_model.py           # Bias-corrected Gradient Boosting
+│   │   └── prophet_model.py        # Multiplicative Bayesian forecasting
+│   └── pipelines/                  # Production pipeline orchestration
+└── main.py                         # Single entry-point CLI
 ```
 
 ---

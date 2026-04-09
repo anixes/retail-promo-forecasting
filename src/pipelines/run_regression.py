@@ -1,7 +1,11 @@
 from src.data.load_data import load_data
 from src.data.preprocess import preprocess_data
-from src.regression.fixed_effects import run_fixed_effects_regression, interpret_results
-from src.regression.heterogeneity import run_heterogeneity_analysis, interpret_heterogeneity
+from src.regression.analysis import (
+    run_fixed_effects_regression, 
+    interpret_results, 
+    run_heterogeneity_analysis, 
+    interpret_heterogeneity
+)
 import logging
 
 logger = logging.getLogger(__name__)

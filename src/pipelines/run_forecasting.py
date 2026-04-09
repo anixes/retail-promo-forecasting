@@ -10,8 +10,8 @@ from src.data.preprocess import preprocess_data
 from src.data.aggregator import aggregate_to_weekly_chain
 from src.features.time_series import create_forecasting_features
 from src.forecasting.baseline import predict_naive_baseline
-from src.forecasting.prophet_engine import train_predict_prophet
-from src.forecasting.lgbm_engine import train_predict_lgbm, plot_feature_importance
+from src.forecasting.prophet_model import train_predict_prophet
+from src.forecasting.lgbm_model import train_predict_lgbm, plot_feature_importance
 from src.evaluation.metrics import calculate_metrics
 
 def run_forecasting_pipeline(transactions_path: str, products_path: str):
