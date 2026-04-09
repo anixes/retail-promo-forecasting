@@ -4,67 +4,58 @@
 [![LightGBM](https://img.shields.io/badge/LightGBM-informational.svg)](https://lightgbm.readthedocs.io/)
 [![Prophet](https://img.shields.io/badge/Prophet-informational.svg)](https://facebook.github.io/prophet/)
 
-This is a case study on modeling retail demand using the Dominick’s Finer Foods dataset. The goal was to combine econometric methods to measure promotional impact with a machine learning pipeline to forecast future sales.
+This project engineers an end-to-end analytical pipeline to quantify promotional lift and forecast future demand using the Dominick’s Finer Foods dataset. It bridges the gap between **Econometric Inference** (measuring truth) and **Machine Learning** (predicting the future).
 
 ---
 
-## Project Overview
-I used a dataset of ~6 million rows of grocery transactions to answer two main questions:
-1. **Inference**: How much does a promotion actually increase sales after controlling for different store locations?
-2. **Prediction**: Can we beat a simple baseline forecast during a period where promotions are constant?
-
-The main finding was a stable **~1,900 unit lift per promotion** across the chain. However, during the forecasting holdout, the stores were on promotion over 95% of the time. This "promo saturation" meant that the simple historical persistence (the Naive model) performed just as well, if not better, than the ML models.
+## Technical Highlights
+*   **Scale**: Processed and analyzed a **6M+ row longitudinal panel** of grocery transactions.
+*   **Inference**: **Isolated marginal promotional lift** using high-dimensional Fixed Effects to account for unobserved store-level heterogeneity.
+*   **Forecasting**: Benchmarked Gradient Boosting (LightGBM) and additive models (Prophet) against a persistence baseline, identifying a **"Saturation Regime"** (>95% promo intensity) that shifted the data-generating process.
 
 ---
 
-## How it's Structured
-The code is modular and can be run via a CLI.
+## Project Structure
+The repository is structured for modularity and reproducibility.
 
 ```bash
 ├── notebooks/
-│   ├── 01_Inference_EDA.ipynb      # Analyzing store variance and distributions
-│   └── 02_Forecasting_EDA.ipynb    # Visualizing the "promo saturation" problem
+│   ├── 01_Inference_EDA.ipynb      # Proofs for Fixed Effects and Log-scale transformations
+│   └── 02_Forecasting_EDA.ipynb    # Visual diagnostic of the "Promo Saturation" regime
 ├── src/
-│   ├── data/                       # Loaders and aggregators
-│   ├── features/                   # Lags and seasonal engineering
-│   ├── regression/                 # Fixed effects modeling
+│   ├── data/                       # Optimized loaders and chain-level aggregators
+│   ├── features/                   # Temporal engineering: seasonal lags ($Lag_{52}$) and rolling dynamics
+│   ├── regression/                 # High-dim Fixed Effects modeling (AbsorbingLS)
 │   ├── forecasting/                # Baseline, Prophet, and LightGBM engines
-│   └── pipelines/                  # Orchestration
-└── main.py                         # CLI entry point
+│   └── pipelines/                  # Pipeline orchestration
+└── main.py                         # CLI interface
 ```
 
 ---
 
-## Methodology
+## Strategic Methodology
 
-### Measuring Promo Lift (Phase 1)
-Instead of just comparing averages, I used **Fixed Effects Regression** (specifically `AbsorbingLS`). This controls for the fact that every store has a different baseline volume. By "absorbing" these differences, the model isolates the actual marginal effect of the promotion itself.
+### 1. Causal Impact Analysis (Phase 1)
+Instead of relying on simple averages, I implemented **Fixed Effects Regression** to "absorb" the baseline volume variance across 80+ stores. By controlling for store-specific traits and seasonality, the model successfully **quantified a stable ~1,900 unit incremental lift** per promotion.
 
-### Forecasting (Phase 2)
-I tested LightGBM and Prophet against a 12-week holdout. To keep the tests fair, I implemented a strict temporal leakage check. This ensured that no "future" information (like next week's promotion) was leaked into the historical features.
-
----
-
-## Key Lessons
-The most interesting part of this project wasn't the final accuracy score, but diagnosing why the ML models were hitting a ceiling. 
-
-Because the holdout period had almost constant promotions, there was very little variance in my most predictive feature. When a feature flatlines like that, it's a reminder that even complex models like LightGBM become dependent on autoregressive patterns (simple persistence). For future work, breaking the forecasts down to the store level would likely reintroduce the variance needed for ML to "win" again.
+### 2. Forensic Forecasting (Phase 2)
+To ensure forecast integrity, I engineered a **strict temporal validation framework** to mitigate data leakage. The key finding was not a "winner" model, but a **feature degeneracy diagnosis**: in periods of near-constant promotion, persistence models effectively establish a dominant ceiling for ML models unless more granular cross-sectional variance is reintroduced.
 
 ---
 
-## How to Run
+## Execution
 
-1. **Install requirements**:
+1. **Environment Setup**:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Run the regression analysis**:
+2. **Run Causal Inference Pipeline**:
    ```bash
    python main.py --task regression
    ```
 
-3. **Run the forecast comparison**:
+3. **Run Forecasting Showdown**:
    ```bash
    python main.py --task forecasting
    ```
@@ -72,4 +63,4 @@ Because the holdout period had almost constant promotions, there was very little
 ---
 
 ### Reflection
-> I built this project to move past just "fitting models." The real challenge was in the data cleaning and the diagnostic work—identifying why a simple baseline was so hard to beat and using that to understand the underlying retail regime.
+> I developed this project to move beyond standard model-fitting. The primary challenge was translating structural data limitations—like promotional saturation—into actionable business insights regarding inventory risk and model selection.
