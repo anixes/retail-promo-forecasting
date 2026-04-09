@@ -1,0 +1,49 @@
+# INTERVIEW CHEAT SHEET: RETAIL DEMAND FORECASTING
+
+================================================================================
+1. THE ELEVATOR PITCH (30 Seconds)
+================================================================================
+"I built a production-grade retail forecasting pipeline using the Dominick's 
+dataset, but the project's real value isn't just the code—it's the diagnostic. 
+By running a forensic post-mortem on why my Naive baseline beat LightGBM, 
+I identified a 'Promotional Saturation' regime where the exogenous signal 
+collapsed, proving that data-generating conditions determine model success 
+more than model complexity."
+
+================================================================================
+2. KEY TECHNICAL PILLARS
+================================================================================
+- DATA INTEGRITY: Audited 6M+ rows using 'OK' quality flags to prune noise.
+- ECONOMETRICS: Used Fixed Effects (OLS) to isolate causal lift from baseline 
+  store heterogeneity.
+- MACHINE LEARNING: Benchmarked Prophet and LightGBM using a leakage-safe 
+  12-week holdout.
+- DIAGNOSIS: Identified Feature Degeneracy (95% promo intensity) in the holdout set.
+
+================================================================================
+3. TOUGH QUESTIONS & ANSWERS
+================================================================================
+Q: "Why did you use Fixed Effects instead of standard OLS?"
+A: "Standard OLS leads to omitted variable bias. Stores in high-income neighborhoods 
+   have higher baseline sales regardless of promos. FE 'absorbs' that store-level 
+   noise so I can measure the PURE lift of the promotion."
+
+Q: "Why did Naive beat LightGBM?"
+A: "Feature Degeneracy. In the holdout period, promotions were active 95% of 
+   the time. When a predictor becomes a constant, it loses its signal. In that 
+   regime, the series is driven by autocorrelation, which the Naive model 
+   specializes in."
+
+Q: "What would you do next for the business?"
+A: "I'd pivot to Store-Level forecasting. The chain-level aggregation hides 
+   localized variance. Moving to the store level would reintroduce 'signal' 
+   that ML models can actually learn from."
+
+================================================================================
+4. MODULAR ARCHITECTURE
+================================================================================
+- src/data: Data engineering (Audit & Aggregation)
+- src/regression: Causal inference (Fixed Effects)
+- src/forecasting: Predictive modeling (LGBM/Prophet)
+- main.py: Production CLI orchestration
+================================================================================
